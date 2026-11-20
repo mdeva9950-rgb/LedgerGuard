@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0c1220">
+    <title>LedgerGuard | Security Console</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='auth-modal-fix-20261120') }}">
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <a class="brand" href="#overview" aria-label="LedgerGuard home">
+            <span class="brand-mark">LG</span>
+            <span class="brand-copy">
+                <strong>LedgerGuard</strong>
+                <small>FINANCIAL SECURITY</small>
+            </span>
+        </a>
+
+        <div class="nav-caption">WORKSPACE</div>
+        <nav class="primary-nav" aria-label="Main navigation">
+            <button class="nav-link active" type="button" data-view="overview">
+                <span class="nav-symbol">▦</span><span>Overview</span>
+            </button>
+            <button class="nav-link" type="button" data-view="requests">
+                <span class="nav-symbol">⇄</span><span>Bank requests</span><span class="nav-count" id="pendingNavCount">0</span>
+            </button>
+            <button class="nav-link" type="button" data-view="threats">
+                <span class="nav-symbol">⌁</span><span>Threat monitor</span>
+            </button>
+            <button class="nav-link" type="button" data-view="activity">
+                <span class="nav-symbol">◷</span><span>Activity &amp; alerts</span>
+            </button>
+            <button class="nav-link" type="button" data-view="reports">
+                <span class="nav-symbol">▤</span><span>Audit &amp; reports</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-status">
+            <span class="status-pulse"></span>
+            <div><strong>Prototype online</strong><small>Local environment</small></div>
+        </div>
+        <div class="sidebar-foot">LEDGERGUARD · TEAM RED HAT</div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="breadcrumb"><span>LEDGERGUARD</span><i>/</i><strong id="breadcrumbCurrent">OVERVIEW</strong></div>
+            <div class="topbar-actions">
+                <span class="system-pill"><span class="status-pulse"></span> SYSTEM ACTIVE</span>
+                <button type="button" class="logout-button" id="ledgerGuardLogout">Manager sign-in</button>
+            </div>
+        </header>
+
+        <div class="page-heading">
+            <div>
+                <p class="eyebrow" id="pageEyebrow">SECURITY AT A GLANCE</p>
+                <h1 id="pageTitle">Overview</h1>
+                <p id="pageSubtitle">A focused view of your vendor banking security.</p>
+            </div>
+            <div class="page-date" id="pageDate"></div>
+        </div>
+
+        <!-- OVERVIEW -->
+        <section class="view-panel active" id="view-overview" aria-labelledby="pageTitle">
+            <div class="metric-grid">
+                <article class="metric-card metric-primary">
+                    <div class="metric-top"><span>Total requests</span><span class="metric-icon">⇄</span></div>
+                    <strong class="metric-value" id="totalCount">—</strong>
+                    <small>All vendor change requests</small>
+                </article>
+                <article class="metric-card">
+                    <div class="metric-top"><span>Awaiting review</span><span class="metric-icon amber">◷</span></div>
+                    <strong class="metric-value" id="pendingCount">—</strong>
+                    <small>Requests needing a decision</small>
+                </article>
+                <article class="metric-card">
+                    <div class="metric-top"><span>Approved</span><span class="metric-icon green">✓</span></div>
+                    <strong class="metric-value" id="approvedCount">—</strong>
+                    <small>Approved bank changes</small>
+                </article>
+                <article class="metric-card">
+                    <div class="metric-top"><span>Blocked IPs</span><span class="metric-icon red">⌑</span></div>
+                    <strong class="metric-value" id="blockedCount">—</strong>
+                    <small>IPs currently in the block list</small>
+                </article>
+            </div>
+
+            <div class="overview-grid">
+                <article class="surface health-overview-card">
+                    <div class="section-heading compact-heading">
+                        <div><p class="eyebrow">SYSTEM POSTURE</p><h2>Security health</h2></div>
+                        <button type="button" class="icon-button" id="refreshHealth" aria-label="Refresh security health" title="Refresh">↻</button>
+                    </div>
+                    <div class="health-main">
+                        <div class="health-ring" id="healthRing" style="--health-value:0">
+                            <div><strong id="healthScore">—</strong><span> / 100</span></div>
+                        </div>
+                        <div class="health-copy">
+                            <span class="status-label" id="healthStatus">CHECKING</span>
+                            <p id="healthStatusMessage">Checking the current security posture…</p>
+                            <small id="healthUpdated">Waiting for data</small>
+                        </div>
+                    </div>
+                    <div class="health-footnote">Rule-based prototype indicator, not a production security certification.</div>
+                    <p id="healthError" class="inline-error" aria-live="polite"></p>
+                </article>
+
+                <article class="surface overview-alerts-card">
+                    <div class="section-heading compact-heading">
+                        <div><p class="eyebrow">WHAT NEEDS ATTENTION</p><h2>Latest alerts</h2></div>
+                        <button type="button" class="text-button" data-open-view="activity">View all <span>→</span></button>
+                    </div>
+                    <div id="overviewAlerts" class="overview-alert-list">
+                        <p class="empty-state">Sign in to load the latest alerts.</p>
+                    </div>
+                </article>
+            </div>
+
+            <article class="surface overview-next-step">
+                <div class="next-step-mark">＋</div>
+                <div class="next-step-copy">
+                    <strong>Need to submit a vendor bank change?</strong>
+                    <p>Create a request and let LedgerGuard record it for manager review.</p>
+                </div>
+                <button type="button" class="button button-secondary" data-open-view="requests">Go to requests <span>→</span></button>
+            </article>
+        </section>
+
+        <!-- REQUESTS -->
+        <section class="view-panel" id="view-requests" aria-labelledby="pageTitle" hidden>
+            <div class="view-intro-row">
+                <div><h2>Bank change workflow</h2><p>Submit a demo request or review requests already in the queue.</p></div>
+                <div class="mini-stat"><span>Rejected</span><strong id="rejectedCount">—</strong></div>
+            </div>
+            <div class="requests-layout">
+                <article class="surface form-surface">
+                    <div class="section-heading">
+                        <div><p class="eyebrow">NEW REQUEST</p><h2>Submit bank details</h2><p class="section-description">Use demo information only.</p></div>
+                        <span class="step-chip">01 / SUBMIT</span>
+                    </div>
+                    <form id="requestForm" class="request-form">
+                        <div class="field-group">
+                            <label for="vendor">Vendor name</label>
+                            <input id="vendor" name="vendor_name" type="text" maxlength="200" placeholder="e.g. Acme Supplies" required>
+                        </div>
+                        <div class="field-group">
+                            <label for="account">Demo bank account number</label>
+                            <input id="account" name="bank_account" type="text" maxlength="100" placeholder="Enter demo account number" required>
+                            <small>Account details are encrypted by the backend before storage.</small>
+                        </div>
+                        <button type="submit" class="button button-primary full-button" id="submitButton">Submit for review <span>→</span></button>
+                    </form>
+                    <div id="result" class="form-result" aria-live="polite"></div>
+                </article>
+
+                <article class="surface queue-surface">
+                    <div class="section-heading queue-heading">
+                        <div><p class="eyebrow">MANAGER WORKSPACE</p><h2>Request queue</h2><p class="section-description">Review and make one decision per request.</p></div>
+                        <button type="button" class="icon-button" id="refreshRequests" aria-label="Refresh requests" title="Refresh">↻</button>
+                    </div>
+                    <div class="queue-summary">
+                        <span><i class="legend-dot pending-dot"></i> Pending</span>
+                        <span><i class="legend-dot approved-dot"></i> Approved</span>
+                        <span><i class="legend-dot rejected-dot"></i> Rejected</span>
+                    </div>
+                    <div id="requestList" class="request-list"><p class="empty-state">Sign in to load requests.</p></div>
+                </article>
+            </div>
+        </section>
+
+        <!-- THREAT MONITOR -->
+        <section class="view-panel" id="view-threats" aria-labelledby="pageTitle" hidden>
+            <div class="monitor-summary-grid">
+                <article class="monitor-summary-card"><span>Recorded attack events</span><strong id="monitorAttacks">—</strong><small>Events counted by LedgerGuard</small></article>
+                <article class="monitor-summary-card"><span>Security alerts</span><strong id="monitorAlerts">—</strong><small>Total alerts in the database</small></article>
+                <article class="monitor-summary-card"><span>Blocked IP entries</span><strong id="monitorBlocked">—</strong><small>Current block-list entries</small></article>
+                <div class="monitor-status-box"><span class="status-pulse"></span><div><strong id="monitorStatus">CHECKING</strong><small id="monitorUpdated">Waiting for data</small></div><button type="button" class="icon-button" id="refreshMonitor" aria-label="Refresh monitor" title="Refresh">↻</button></div>
+            </div>
+            <p id="monitorError" class="inline-error" aria-live="polite"></p>
+
+            <div class="threat-layout">
+                <article class="surface chart-surface">
+                    <div class="section-heading">
+                        <div><p class="eyebrow">RECENT PATTERN</p><h2>Attack activity</h2><p class="section-description">Recorded suspicious events by day · up to 7 days.</p></div>
+                        <button type="button" class="icon-button" id="refreshAttackChart" aria-label="Refresh attack chart" title="Refresh">↻</button>
+                    </div>
+                    <div id="attackChart" class="attack-chart"><p class="empty-state">Sign in to load activity.</p></div>
+                    <p id="attackChartError" class="inline-error"></p>
+                </article>
+                <article class="surface threat-surface">
+                    <div class="section-heading">
+                        <div><p class="eyebrow">SOURCE OVERVIEW</p><h2>Top threat IPs</h2><p class="section-description">Ranked by recorded suspicious events.</p></div>
+                        <button type="button" class="icon-button" id="refreshThreatIPs" aria-label="Refresh threat IPs" title="Refresh">↻</button>
+                    </div>
+                    <div id="threatIPList" class="threat-list"><p class="empty-state">Sign in to load threat IPs.</p></div>
+                    <p id="threatIPError" class="inline-error"></p>
+                </article>
+            </div>
+        </section>
+
+        <!-- ACTIVITY & ALERTS -->
+        <section class="view-panel" id="view-activity" aria-labelledby="pageTitle" hidden>
+            <div class="activity-layout">
+                <article class="surface activity-surface">
+                    <div class="section-heading">
+                        <div><p class="eyebrow">EVENT STREAM</p><h2>Activity timeline</h2><p class="section-description">Latest recorded security and workflow events.</p></div>
+                    <button type="button" class="icon-button" id="refreshTimeline" aria-label="Refresh timeline" title="Refresh">↻</button>
+                    </div>
+                    <div id="timelineList" class="timeline-list"><p class="empty-state">Sign in to load the timeline.</p></div>
+                    <p id="timelineError" class="inline-error" aria-live="polite"></p>
+                </article>
+                <article class="surface alerts-surface">
+                    <div class="section-heading">
+                        <div><p class="eyebrow">ATTENTION REQUIRED</p><h2>Security alerts</h2><p class="section-description">Warnings generated by the backend.</p></div>
+                        <button type="button" class="icon-button" id="refreshAlerts" aria-label="Refresh alerts" title="Refresh">↻</button>
+                    </div>
+                    <div id="alertList" class="alert-list"><p class="empty-state">Sign in to load alerts.</p></div>
+                    <p id="alertError" class="inline-error"></p>
+                </article>
+            </div>
+        </section>
+
+        <!-- REPORTS -->
+        <section class="view-panel" id="view-reports" aria-labelledby="pageTitle" hidden>
+            <article class="surface report-banner">
+                <div class="report-icon">⇩</div>
+                <div class="report-copy"><p class="eyebrow">EXPORT CENTER</p><h2>Security report</h2><p>Download a CSV snapshot containing bank-change request records, audit events and security alerts.</p><small>Account numbers are not included in the CSV export.</small></div>
+                <button type="button" class="button button-primary" id="exportReportButton">Export CSV <span>↓</span></button>
+            </article>
+            <p id="exportReportStatus" class="export-status" aria-live="polite"></p>
+            <article class="surface logs-surface">
+                <div class="section-heading logs-heading">
+                    <div><p class="eyebrow">TRACEABILITY</p><h2>Audit log</h2><p class="section-description">Most recent recorded events, newest first.</p></div>
+                    <div class="log-tools"><input id="logSearch" type="search" placeholder="Search events or details" aria-label="Search audit logs"><button type="button" class="icon-button" id="refreshLogs" aria-label="Refresh logs" title="Refresh">↻</button></div>
+                </div>
+                <div id="logList" class="log-list"><p class="empty-state">Sign in to load audit logs.</p></div>
+                <p id="logError" class="inline-error"></p>
+            </article>
+        </section>
+
+        <footer class="app-footer"><span>LedgerGuard Prototype</span><span>Financial change protection · Team Red Hat</span></footer>
+    </main>
+</div>
+
+<!-- Manager authentication -->
+<div id="managerModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="managerModalTitle">
+    <div class="modal-box">
+        <div class="modal-brand-mark">LG</div>
+        <p class="eyebrow">RESTRICTED ACCESS</p>
+        <h2 id="managerModalTitle">Manager authentication</h2>
+        <p class="modal-description">Sign in to review requests and access security records.</p>
+        <form id="managerLoginForm" class="login-form">
+            <div class="field-group"><label for="managerUsername">Username</label><input type="text" id="managerUsername" autocomplete="username" required></div>
+            <div class="field-group"><label for="managerPassword">Password</label><input type="password" id="managerPassword" autocomplete="current-password" required></div>
+            <div id="managerMessage" aria-live="polite"></div>
+            <button type="submit" id="managerLoginButton" class="button button-primary full-button">Sign in securely <span>→</span></button>
+            <button type="button" id="cancelManagerLogin" class="button button-quiet full-button">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js', v='auth-modal-fix-20261120') }}"></script>
+</body>
+</html>
